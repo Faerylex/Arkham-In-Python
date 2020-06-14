@@ -20,6 +20,7 @@ c = con.cursor()
 
 
 c.execute('DROP TABLE monsters') #drops monsters table; useful in debugging
+c.execute('DROP TABLE prac')
 
 c.execute('''CREATE TABLE monsters
 (id int PRIMARY KEY,
@@ -50,20 +51,63 @@ c.execute("INSERT INTO monsters VALUES (2,'Zombie','Black','moon', 1,-1,-1,1,2,1
 c.execute("INSERT INTO monsters VALUES (3,'Ghoul','Black','hexagon',-3,0,-1,1,1,1,0,0,1,0,0,0,0,0,0,0)")
 
 con.commit()
+
+c.execute('''CREATE TABLE prac
+(id int PRIMARY KEY,
+name text,
+color text)''')
+
+
+c.execute("INSERT INTO prac VALUES (1,'First','b')")
+c.execute("INSERT INTO prac VALUES (2,'2nd','r')")
+c.execute("INSERT INTO prac VALUES (3,'third','r')")
+con.commit()
+
 con.close()
 
 
 
-#Retrieves a random onster from the database and returns it as a tupble.
-def get_random_monster():
-    connection = sqlite3.connect('arkham.db')
-    cursor = connection.cursor()
-    cursor.execute('SELECT MAX(id) FROM monsters')
-    mons = (random.randint(1,cursor.fetchone()[0]),)
-    cursor.execute('SELECT * FROM monsters WHERE id = ?', mons)
-    return(cursor.fetchone())
-    connection.close()
-    
 
-    
+#Defition of monster class that accesses arkham.db to populate monster stats.
+class monster:
+    def __init__(self, name='NULL'):
+            conn = sqlite3.connect('arkham.db')
+            cursor = conn.cursor()
+            if name == 'NULL':
+                cursor.execute('SELECT MAX(id) FROM monsters')
+                mons = (random.randint(1,cursor.fetchone()[0]),)
+                cursor.execute('SELECT * FROM monsters WHERE id = ?', mons)
+            else:
+                t =(name,)
+                mons = cursor.execute('Select * FROM monsters WHERE name = ?', t)
+            spawn = cursor.fetchone()
+            conn.close()
+            self.name = spawn[1]
+            self.color = spawn[2]
+            self.symbol = spawn[3]
+            self.sneak_md = spawn[4]
+            self.horror_mod = spawn[5]
+            self.combat_mod = spawn[6]
+            self.horror_dmg = spawn[7]
+            self.combat_dmg = spawn[8]
+            self.toughness = spawn[9]
+            
+            
+# use monster() to generate a random monster
+
+             
+             #use monster('name') to generate a specific mosnter
+
+
+
+
+
+
+
+
+
+
+
+
+
 
