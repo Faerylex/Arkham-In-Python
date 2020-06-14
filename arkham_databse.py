@@ -96,18 +96,13 @@ class monster:
 # use monster() to generate a random monster
 
              
-             #use monster('name') to generate a specific mosnter
+ #use monster('name') to generate a specific mosnter
+ 
+#Example:
+
+    
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+zombie = monster('Zombie')
+print(zombie.name)
+print("Zombie's have a toughness of %i" % zombie.toughness)
