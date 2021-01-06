@@ -14,6 +14,8 @@ Created on Sat Jun 13 15:29:47 2020
 
 import sqlite3
 import random
+import MonsterForm
+import combat
 
 con = sqlite3.connect('arkham.db')
 c = con.cursor()
@@ -50,7 +52,7 @@ elusive int
 c.execute("INSERT INTO monsters VALUES (1,'Byakhee','Blue','circle',-2,-1,0,1,2,1,0,0,0,0,0,0,0,0,0,0)")
 c.execute("INSERT INTO monsters VALUES (2,'Zombie','Black','moon', 1,-1,-1,1,2,1,0,1,0,0,0,0,0,0,0,0)")
 c.execute("INSERT INTO monsters VALUES (3,'Ghoul','Black','hexagon',-3,0,-1,1,1,1,0,0,1,0,0,0,0,0,0,0)")
-
+c.execute("INSERT INTO monsters VALUES (4,'Default','Black','moon',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)")
 con.commit()
 
 
@@ -103,6 +105,8 @@ c.execute('INSERT INTO items VALUES (2, "Dynamite", "common", 1,8,0,1)')
 c.execute("INSERT INTO items VALUES (3, 'Tommy Gun', 'common', 1,6,0,0)")
 
 con.commit()
+
+
 con.close()
 
 
@@ -125,7 +129,7 @@ class monster:
             self.name = spawn[1]
             self.color = spawn[2]
             self.symbol = spawn[3]
-            self.sneak_md = spawn[4]
+            self.sneak_mod = spawn[4]
             self.horror_mod = spawn[5]
             self.combat_mod = spawn[6]
             self.horror_dmg = spawn[7]
@@ -137,6 +141,7 @@ class monster:
 #use monster('name') to generate a specific mosnter
 #Example:
 zombie = monster('Zombie')
+default = monster('Default')
 print(zombie.name)
 print("Zombie's have a toughness of %i" % zombie.toughness)
 
@@ -170,6 +175,57 @@ class character:
             self.max_luck = spawn[8]
             self.max_sanity = spawn[9]
             self.max_stamina = spawn[10]
+            self.health = self.max_stamina
+            self.sanity = self.max_sanity
+            self.blessed = False
+            self.cursed = False
+            
+            #Place holding values for testing/troubleshooting
+            self.sneak = 2
+            self.fight = 4
+            self.will = 3
+            
+            
+            
+    #Die roll function. Takes argument 'dice', which is the number of dice to be rolled. 
+    #Returns integer number of successes
+    def roll_dice(self, dice):
+        successes = 0
+        check = 5
+        if (self.blessed):
+            check = 4
+        if (self.cursed):
+            check = 6
+        for i in range(dice):
+            if (random.randrange(1,7,1) >= check):
+                successes += 1
+        return(successes)
+    
+    #Assorted checks. Uses the roll_dice function to determine if check was passed. Returns boolean
+    # In general, the monster can be passed optionally, allowing the checks to be made outside of combat.
+    #If not monster is passed, the default is a monster with 0 for all attributes
+    
+    def sneak_check(self, monster=default):
+        rolls = self.sneak + monster.sneak_mod
+        sucs = self.roll_dice(rolls)
+        if (sucs >= 1):
+            return(True)
+        else:
+            return(False)
+        
+    def will_check(self, monster=default):
+        rolls = self.will + monster.horror_mod
+        sucs = self.roll_dice(rolls)
+        if (sucs >= 1):
+            return(True)
+        else:
+            return(False)
+        
+
+    
+        
+            
+        
     
 
 
@@ -233,9 +289,7 @@ class inventory:
     
         
 ######### Not sure how to handle multiple instances of item yet
-        
-
-
+"""
 inventory1 = inventory(player1)
                   
 inventory1.display()
@@ -246,7 +300,9 @@ inventory1.add_item(item1)
 inventory1.remove_item(item1)
 
 inventory1.display()
-    
+"""
+
+combat.combat_prompt(player1, zombie)
     
     
     
